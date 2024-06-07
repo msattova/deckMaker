@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeckMake</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
+    integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+
+  <script>
+    function incrementValue(index, maxVal) {
+      const target = document.querySelector(`#quantity-input-${index}`);
+      if (target.value >= maxVal) return;
+      target.value = `${parseInt(target.value) + 1}`;
+    }
+    function decrementValue(index, minVal) {
+      const target = document.querySelector(`#quantity-input-${index}`);
+      if (target.value <= minVal) return;
+      target.value = `${parseInt(target.value) - 1}`;
+    }
+  </script>
+
+</head>
+
+<body>
+
+  <template id="cardList-template">
+    <div class="bg-gray-700 flex flex-row max-h-52 p-4">
+      <img class="w-auto" src="" alt="" id="card-chara">
+      <p id="card-name"></p>
+      <form class="max-w-xs mx-auto">
+        <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">カードの枚数:</label>
+        <div class="relative flex items-center max-w-[8rem]">
+          <button type="button" id="decrement-button" data-input-counter-decrement="quantity-input"
+            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none">
+            <svg class="w-3 h-3 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 18 2">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h16" />
+            </svg>
+          </button>
+          <input type="text" id="quantity-input" data-input-counter data-input-counter-min="1"
+            data-input-counter-max="4" aria-describedby="helper-text-explanation"
+            class="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="3" value="1" required />
+          <button type="button" id="increment-button" data-input-counter-increment="quantity-input"
+            class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none">
+            <svg class="w-3 h-3 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 18 18">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 1v16M1 9h16" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <div class="conteiner h-64 flex w-screen m-0.5 flex-col">
+
+
+    <div id="drop-area" class="flex items-center justify-center m-5">
+      <label for="input-images"
+        class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+          </svg>
+          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">クリックして画像を選択</span> するか
+            <span class="font-semibold">ドラッグアンドドロップ</span>してください
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">対応拡張子：PNG, JPG</p>
+        </div>
+        <input id="input-images" type="file" class="hidden" accept="image/png, image/jpeg" multiple />
+      </label>
+    </div>
+
+    <div class="flex flex-row-reverse">
+
+      <button type="button" id="download-button"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 max-w-fit -right-0">ユドナリウム向けデッキファイルをダウンロード</button>
+
+    </div>
+
+    <div id="cards-container" class="m-1 flex basis-1 flex-col gap-2 flex-wrap w-screen h-auto pb-20 max-w-fit">
+
+    </div>
+  </div>
+
+  <script src="./getImages.js"></script>
+  <script src="./makeXML.js"></script>
+
+  <script>
+
+    const downloadZipFile = (imageDataList) => {
+
+      const zip = new JSZip();
+
+      imageDataList.forEach((el, ind) => {
+        const targetInput = document.querySelector(`#quantity-input-${el.index}`);
+        imageDataList[ind].quantity = parseInt(targetInput.value);
+      });
+
+      const addImagesToZip = (zipObj, imageDataList) => {
+        const xmlStr = makeXML(imageDataList);
+        console.log("xml", xmlStr);
+        return new Promise((resolve, reject) => {
+          const arr = [].map.call(imageDataList, elm =>
+              zipObj.file(elm.name + ".png", elm.blob)
+          ).push(
+              zipObj.file("data.xml", new Blob([xmlStr], {type: "application/xml"}))
+          );
+          resolve(arr);
+        }).then((arr) => { console.log("test", arr) });
+      }
+
+      const addToZipArr = addImagesToZip(zip, imageDataList);
+      console.log(addToZipArr);
+      addToZipArr.then(() => {
+        zip.generateAsync({ type: "blob" }).then((compressData) => {
+          console.log("compressData", compressData);
+          let zipBlob = new Blob([compressData], { 'type': 'application/zip' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(zipBlob);
+          a.download = "deck.zip";
+          a.click();
+        });
+      });
+    };
+
+    const drop_area = document.querySelector("#drop-area");
+    const input = document.querySelector("#input-images");
+
+    let inputFiles;
+
+    const cardListTemplate = document.querySelector("#cardList-template");
+
+    const cardsContainer = document.querySelector("#cards-container");
+
+    document.querySelector("#download-button").addEventListener("click", (e) => {
+      console.log("dl", inputFiles);
+      const imageDataList = Promise.all(getImages(inputFiles)).then((data) => {
+        console.log("dl-data", data);
+        downloadZipFile(data);
+      });
+    });
+
+
+    const deplicateForm = (imageData) => {
+      console.log("dep", imageData);
+      const clone = cardListTemplate.content.children[0].cloneNode(true);
+      const decrementButton = clone.querySelector("#decrement-button");
+      const incrementButton = clone.querySelector("#increment-button");
+      const inputArea = clone.querySelector("#quantity-input");
+
+      const img = clone.children[0];
+      const name = clone.children[1];
+      img.src = imageData.dataURL;
+      img.id = `${img.id}-${imageData.index}`;
+      name.id = `${name.id}-${imageData.index}`;
+      inputArea.id = `${inputArea.id}-${imageData.index}`;
+      clone.setAttribute("id", `cardComponent-${imageData.index}`);
+
+      decrementButton.id = `${decrementButton.id}-${imageData.index}`;
+      incrementButton.id = `${incrementButton.id}-${imageData.index}`;
+
+      decrementButton.setAttribute("onclick", `decrementValue(${imageData.index}, 1)`);
+      incrementButton.setAttribute("onclick", `incrementValue(${imageData.index}, 4)`);
+
+
+      console.log(clone);
+      cardsContainer.appendChild(clone);
+    };
+
+    const makeCardList = (files) => {
+      Promise.all(getImages(files)).then((filesData) => {
+        [].forEach.call(filesData, (img) => deplicateForm(img));
+      });
+    };
+
+    input.addEventListener("input", (e) => {
+      const files = e.currentTarget.files;
+      inputFiles = files;
+      makeCardList(files);
+    });
+
+    ["drag", "dragstart", "dragend", "dragover", "dragenter", "dragleave"].forEach(event => {
+      drop_area.addEventListener(event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+
+    drop_area.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const droppedFiles = e.dataTransfer.files;
+      inputFiles = droppedFiles;
+      if (droppedFiles.length <= 0) return;
+      makeCardList(droppedFiles);
+    }
+    );
+
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+</body>
+
+</html>
