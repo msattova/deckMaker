@@ -33,10 +33,10 @@ const cardTemplate = (frontFileName, backFileName) => `
     </card>
 `;
 
-function makeXML(imageDataList) {
+function makeXML(imageDataList, quantities, backImageName = "./assets/images/trump/z02.gif") {
   //一旦、裏面画像にはユドナリウムのデフォルトのトランプ画像を指定しておく
   const cardList = [].map.call(imageDataList, (imageData) => {
-    return new Array(imageData.quantity).fill(cardTemplate(imageData.name, "./assets/images/trump/z02.gif"));
+    return new Array(quantities[imageData.identifier]).fill(cardTemplate(imageData.name, backImageName));
   }).flat(Infinity);
   return xmlTemplate(cardList)
 }

@@ -13,13 +13,13 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
 
   <script>
-    function incrementValue(index, maxVal) {
-      const target = document.querySelector(`#quantity-input-${index}`);
+    function incrementValue(id, maxVal) {
+      const target = document.querySelector(`#quantity-input-${id}`);
       if (target.value >= maxVal) return;
       target.value = `${parseInt(target.value) + 1}`;
     }
-    function decrementValue(index, minVal) {
-      const target = document.querySelector(`#quantity-input-${index}`);
+    function decrementValue(id, minVal) {
+      const target = document.querySelector(`#quantity-input-${id}`);
       if (target.value <= minVal) return;
       target.value = `${parseInt(target.value) - 1}`;
     }
@@ -60,8 +60,7 @@
     </div>
   </template>
 
-  <div class="conteiner h-64 flex w-screen m-0.5 flex-col">
-
+  <div class="conteiner flex w-screen p-1 flex-col">
 
     <div id="drop-area" class="flex items-center justify-center m-5">
       <label for="input-images"
@@ -72,7 +71,9 @@
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
           </svg>
-          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">クリックして画像を選択</span> するか
+          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            カード表面画像をアップロード
+            <br><span class="font-semibold">クリックして画像を選択</span> するか
             <span class="font-semibold">ドラッグアンドドロップ</span>してください
           </p>
           <p class="text-xs text-gray-500 dark:text-gray-400">対応拡張子：PNG, JPG</p>
@@ -81,10 +82,45 @@
       </label>
     </div>
 
+
+    <details class="ml-5 p-4 w-full text-gray-700">
+      <summary>カードの裏面画像を指定する</summary>
+    <div class="flex flex-row h-64">
+
+    <div id="drop-area-rev" class="flex items-center justify-center m-5">
+      <label for="input-image-rev"
+        class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+          <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="none" viewBox="0 0 20 16">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+          </svg>
+          <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+            カード裏面画像をアップロード
+            <br><span class="font-semibold">クリックして画像を選択</span> するか
+            <span class="font-semibold">ドラッグアンドドロップ</span>してください
+          </p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">対応拡張子：PNG, JPG</p>
+        </div>
+        <input id="input-image-rev" type="file" class="hidden" accept="image/png, image/jpeg" />
+      </label>
+    </div>
+
+  <div id="cards-container-rev" class="m-1 flex basis-1 flex-col gap-2 flex-wrap h-full ">
+    <img class="max-w-fit h-full" src="" alt="" id="back-image">
+  </div>
+
+    </div>
+
+  </details>
+
+
     <div class="flex flex-row-reverse">
 
       <button type="button" id="download-button"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 max-w-fit -right-0">ユドナリウム向けデッキファイルをダウンロード</button>
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 max-w-fit -right-0">
+        ユドナリウム向けデッキファイルをダウンロード</button>
 
     </div>
 
@@ -98,33 +134,61 @@
 
   <script>
 
-    const downloadZipFile = (imageDataList) => {
+    const downloadZipFile = (imageDataList, backImage) => {
 
       const zip = new JSZip();
 
+      const quantities = {};
+
       imageDataList.forEach((el, ind) => {
-        const targetInput = document.querySelector(`#quantity-input-${el.index}`);
-        imageDataList[ind].quantity = parseInt(targetInput.value);
+        for (let i = 0; i<10; i++){
+          setTimeout(() => {console.log(el.identifier);}, 20000);
+        }
+        console.log(el);
+        console.log(el.identifier);
+        const targetInput = document.querySelector(`#quantity-input-${el.identifier}`);
+        console.log(targetInput)
+        quantities[el.identifier] = parseInt(targetInput.value);
       });
 
       const addImagesToZip = (zipObj, imageDataList) => {
-        const xmlStr = makeXML(imageDataList);
-        console.log("xml", xmlStr);
-        return new Promise((resolve, reject) => {
-          const arr = [].map.call(imageDataList, elm =>
+        // console.log("xml", xmlStr);
+        if (backImageData == null) {
+          const xmlStr = makeXML(imageDataList, quantities);
+
+          return new Promise((resolve, reject) => {
+            const arr = [].map.call(imageDataList, elm =>
               zipObj.file(elm.name + ".png", elm.blob)
-          ).push(
-              zipObj.file("data.xml", new Blob([xmlStr], {type: "application/xml"}))
-          );
-          resolve(arr);
-        }).then((arr) => { console.log("test", arr) });
+            ).push(
+              zipObj.file("data.xml", new Blob([xmlStr], { type: "application/xml" }))
+            );
+            resolve(arr);
+          }).then((arr) => {
+            //console.log("test", arr)
+          });
+        } else {
+          const xmlStr = makeXML(imageDataList, quantities, backImageData.name);
+
+          return new Promise((resolve, reject) => {
+            const arr = [].map.call(imageDataList, elm =>
+              zipObj.file(elm.name + ".png", elm.blob)
+            ).push(
+              zipObj.file(backImageData.name + ".png", backImageData.blob),
+              zipObj.file("data.xml", new Blob([xmlStr], { type: "application/xml" }))
+            );
+            resolve(arr);
+          }).then((arr) => {
+            //console.log("test", arr)
+          });
+        }
+
       }
 
       const addToZipArr = addImagesToZip(zip, imageDataList);
-      console.log(addToZipArr);
+      //console.log(addToZipArr);
       addToZipArr.then(() => {
         zip.generateAsync({ type: "blob" }).then((compressData) => {
-          console.log("compressData", compressData);
+          //console.log("compressData", compressData);
           let zipBlob = new Blob([compressData], { 'type': 'application/zip' });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(zipBlob);
@@ -137,7 +201,14 @@
     const drop_area = document.querySelector("#drop-area");
     const input = document.querySelector("#input-images");
 
-    let inputFiles;
+    const drop_area_rev = document.querySelector("#drop-area-rev");
+    const input_rev = document.querySelector("#input-image-rev");
+
+    let inputFiles = [];
+
+    let backImage;
+
+    let backImageData;
 
     const cardListTemplate = document.querySelector("#cardList-template");
 
@@ -145,48 +216,50 @@
 
     document.querySelector("#download-button").addEventListener("click", (e) => {
       console.log("dl", inputFiles);
-      const imageDataList = Promise.all(getImages(inputFiles)).then((data) => {
-        console.log("dl-data", data);
-        downloadZipFile(data);
-      });
+      downloadZipFile(inputFiles, backImage);
     });
 
 
     const deplicateForm = (imageData) => {
-      console.log("dep", imageData);
+      //console.log("dep", imageData);
       const clone = cardListTemplate.content.children[0].cloneNode(true);
       const decrementButton = clone.querySelector("#decrement-button");
       const incrementButton = clone.querySelector("#increment-button");
       const inputArea = clone.querySelector("#quantity-input");
 
+      const identifier = imageData.identifier;
+
       const img = clone.children[0];
       const name = clone.children[1];
       img.src = imageData.dataURL;
-      img.id = `${img.id}-${imageData.index}`;
-      name.id = `${name.id}-${imageData.index}`;
-      inputArea.id = `${inputArea.id}-${imageData.index}`;
-      clone.setAttribute("id", `cardComponent-${imageData.index}`);
+      img.id = `${img.id}-${identifier}`;
+      name.id = `${name.id}-${identifier}`;
+      inputArea.id = `${inputArea.id}-${identifier}`;
+      clone.setAttribute("id", `cardComponent-${identifier}`);
 
-      decrementButton.id = `${decrementButton.id}-${imageData.index}`;
-      incrementButton.id = `${incrementButton.id}-${imageData.index}`;
+      decrementButton.id = `${decrementButton.id}-${identifier}`;
+      incrementButton.id = `${incrementButton.id}-${identifier}`;
 
-      decrementButton.setAttribute("onclick", `decrementValue(${imageData.index}, 1)`);
-      incrementButton.setAttribute("onclick", `incrementValue(${imageData.index}, 4)`);
+      decrementButton.setAttribute("onclick", `decrementValue("${identifier}", 1)`);
+      incrementButton.setAttribute("onclick", `incrementValue("${identifier}", 4)`);
 
 
-      console.log(clone);
+      //console.log(clone);
       cardsContainer.appendChild(clone);
     };
 
     const makeCardList = (files) => {
       Promise.all(getImages(files)).then((filesData) => {
         [].forEach.call(filesData, (img) => deplicateForm(img));
+        inputFiles = inputFiles.concat([...Array.from(filesData)]);
+        console.log(filesData);
       });
     };
 
+
     input.addEventListener("input", (e) => {
       const files = e.currentTarget.files;
-      inputFiles = files;
+      console.log([...Array.from(files)]);
       makeCardList(files);
     });
 
@@ -202,11 +275,42 @@
       e.preventDefault();
       e.stopPropagation();
       const droppedFiles = e.dataTransfer.files;
-      inputFiles = droppedFiles;
       if (droppedFiles.length <= 0) return;
       makeCardList(droppedFiles);
     }
     );
+
+      input_rev.addEventListener("input", (e) => {
+        const files = e.currentTarget.files;
+        backImage = files[0];
+        new Promise((resolve) => {
+            resolve(getImage(backImage));
+          }).then((imageData) => {
+          const img = document.querySelector("#back-image");
+          img.src = imageData.dataURL;
+          img.id = `${img.id}-${imageData.identifier}`;
+          backImageData = imageData;
+        });
+      });
+
+      ["drag", "dragstart", "dragend", "dragover", "dragenter", "dragleave"].forEach(event => {
+        drop_area_rev.addEventListener(event, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+
+
+      drop_area_rev.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const droppedFiles = e.dataTransfer.files;
+        backImage = droppedFiles[0];
+        Promise.all(getImage(backImage)).then((filesData) => {
+          [].forEach.call(filesData, (img) => deplicateForm(img));
+        });;
+      }
+      );
 
   </script>
 
