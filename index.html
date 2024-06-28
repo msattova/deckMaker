@@ -23,6 +23,13 @@
       if (target.value <= minVal) return;
       target.value = `${parseInt(target.value) - 1}`;
     }
+    function deleteCard(id) {
+      const target = document.querySelector(`#cardComponent-${id}`);
+      console.log(target);
+      target.parentNode.removeChild(target);
+      inputFiles = inputFiles.filter(e => e.identifier != id);
+      console.log("after Delete", inputFiles);
+    }
   </script>
 
 </head>
@@ -33,6 +40,7 @@
     <div class="bg-gray-700 flex flex-row max-h-52 p-4">
       <img class="w-auto" src="" alt="" id="card-chara">
       <p id="card-name"></p>
+      <div class="max-w-xs mx-auto flex flex-col place-content-between">
       <form class="max-w-xs mx-auto">
         <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">カードの枚数:</label>
         <div class="relative flex items-center max-w-[8rem]">
@@ -57,6 +65,16 @@
           </button>
         </div>
       </form>
+        <button type="button"
+          id="delete-button"
+          class="bottom-0.5 inline-flex items-center gap-1.5 rounded-lg border border-red-600 bg-red-600 px-5 py-2.5 text-center text-sm font-medium text-white shadow-sm transition-all hover:border-red-800 hover:bg-red-800 focus:ring focus:ring-red-200 disabled:cursor-not-allowed disabled:border-red-300 disabled:bg-red-300 max-h-fit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" class="h-4 w-4">
+            <path fill="currentColor"
+              d="M13.5 6.5V7h5v-.5a2.5 2.5 0 0 0-5 0Zm-2 .5v-.5a4.5 4.5 0 1 1 9 0V7H28a1 1 0 1 1 0 2h-1.508L24.6 25.568A5 5 0 0 1 19.63 30h-7.26a5 5 0 0 1-4.97-4.432L5.508 9H4a1 1 0 0 1 0-2h7.5Zm2.5 6.5a1 1 0 1 0-2 0v10a1 1 0 1 0 2 0v-10Zm5-1a1 1 0 0 0-1 1v10a1 1 0 1 0 2 0v-10a1 1 0 0 0-1-1Z" />
+          </svg>
+          削除
+        </button>
+        </div>
     </div>
   </template>
 
@@ -226,6 +244,7 @@
       const decrementButton = clone.querySelector("#decrement-button");
       const incrementButton = clone.querySelector("#increment-button");
       const inputArea = clone.querySelector("#quantity-input");
+      const deleteButton = clone.querySelector("#delete-button");
 
       const identifier = imageData.identifier;
 
@@ -235,6 +254,7 @@
       img.id = `${img.id}-${identifier}`;
       name.id = `${name.id}-${identifier}`;
       inputArea.id = `${inputArea.id}-${identifier}`;
+      deleteButton.id = `${deleteButton.id}-${identifier}`;
       clone.setAttribute("id", `cardComponent-${identifier}`);
 
       decrementButton.id = `${decrementButton.id}-${identifier}`;
@@ -243,6 +263,7 @@
       decrementButton.setAttribute("onclick", `decrementValue("${identifier}", 1)`);
       incrementButton.setAttribute("onclick", `incrementValue("${identifier}", 4)`);
 
+      deleteButton.setAttribute("onclick", `deleteCard("${identifier}")`);
 
       //console.log(clone);
       cardsContainer.appendChild(clone);
